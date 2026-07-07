@@ -1,0 +1,49 @@
+services:
+
+  # --- ML: RFM Segmentation ---
+  ml-rfm:
+    build: .
+    container_name: ml-rfm
+    command: python rfm_segmentation.py
+    volumes:
+      - ml_output:/app/output
+    restart: "no"
+
+  # --- ML: Market Basket Analysis ---
+  ml-basket:
+    build: .
+    container_name: ml-basket
+    command: python market_basket.py
+    volumes:
+      - ml_output:/app/output
+    restart: "no"
+
+  # --- ML: Churn Prediction ---
+  ml-churn:
+    build: .
+    container_name: ml-churn
+    command: python churn_prediction.py
+    volumes:
+      - ml_output:/app/output
+    restart: "no"
+
+  # --- ML: Time Series Forecasting ---
+  ml-forecast:
+    build: .
+    container_name: ml-forecast
+    command: python time_series_forecast.py
+    volumes:
+      - ml_output:/app/output
+    restart: "no"
+
+  # --- ML: Product Recommendation ---
+  ml-recommend:
+    build: .
+    container_name: ml-recommend
+    command: python product_recommendation.py
+    volumes:
+      - ml_output:/app/output
+    restart: "no"
+
+volumes:
+  ml_output:

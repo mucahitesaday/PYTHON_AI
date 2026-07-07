@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+
+  # --- Web Sunucusu (Nginx) ---
+  web:
+    image: nginx:latest
+    container_name: web-sunucu
+    ports:
+      - "8080:80"         # localhost:8080 → nginx:80
+    volumes:
+      - ./html:/usr/share/nginx/html   # statik dosyalar
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  # --- Uygulama Sunucusu (Node.js) ---
+  app:
+    image: node:18-alpine
+    container_name: app-sunucu
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    command: sh -c "echo 'Uygulama çalışıyor' && sleep infinity"
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  # --- Veritabanı (PostgreSQL) ---
+  db:
+    image: postgres:15-alpine
+    container_name: veritabani
+    environment:
+      POSTGRES_USER: kullanici
+      POSTGRES_PASSWORD: sifre123
+      POSTGRES_DB: uygulamam
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # kalıcı veri
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # --- Cache (Redis) ---
+  cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:    # PostgreSQL verisi kalıcı saklanır

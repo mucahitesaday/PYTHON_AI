@@ -1,0 +1,100 @@
+services:
+
+  # --- ML Service 1: Sentiment Analysis ---
+  ml-sentiment:
+    build: ./services/sentiment
+    container_name: ml-sentiment
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+  # --- ML Service 2: Churn Prediction ---
+  ml-churn:
+    build: ./services/churn
+    container_name: ml-churn
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - DATA_PATH=/data/online_retail.xlsx
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+  # --- ML Service 3: Product Recommendation ---
+  ml-recommend:
+    build: ./services/recommend
+    container_name: ml-recommend
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
+      - DATA_PATH=/data/online_retail.xlsx
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+  # --- ML Service 4: Sales Forecasting ---
+  ml-forecast:
+    build: ./services/forecast
+    container_name: ml-forecast
+    ports:
+      - "5004:5004"
+    environment:
+      - PORT=5004
+      - DATA_PATH=/data/online_retail.xlsx
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+  # --- ML Service 5: Customer Segmentation ---
+  ml-segmentation:
+    build: ./services/segmentation
+    container_name: ml-segmentation
+    ports:
+      - "5005:5005"
+    environment:
+      - PORT=5005
+      - DATA_PATH=/data/online_retail.xlsx
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+  # --- API Gateway ---
+  ml-gateway:
+    build: ./gateway
+    container_name: ml-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - SENTIMENT_URL=http://ml-sentiment:5001
+      - CHURN_URL=http://ml-churn:5002
+      - RECOMMEND_URL=http://ml-recommend:5003
+      - FORECAST_URL=http://ml-forecast:5004
+      - SEGMENTATION_URL=http://ml-segmentation:5005
+    depends_on:
+      - ml-sentiment
+      - ml-churn
+      - ml-recommend
+      - ml-forecast
+      - ml-segmentation
+    restart: unless-stopped
+    networks:
+      - ml-network
+
+networks:
+  ml-network:
+    driver: bridge
